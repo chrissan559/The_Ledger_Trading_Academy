@@ -1,1 +1,722 @@
-page
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ledger — Trading Mentorship & Affiliate Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{
+    --ink:#14201C;
+    --ink-soft:#1E2E27;
+    --parchment:#E8E1CF;
+    --parchment-dim:#DCD3BC;
+    --brass:#A87C2B;
+    --brass-light:#C79A46;
+    --sage:#5F7A5A;
+    --rust:#A6482E;
+    --ivory:#F2EFE6;
+    --line:rgba(242,239,230,0.14);
+    --line-dark:rgba(20,32,28,0.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'IBM Plex Sans',sans-serif;
+    background:var(--parchment);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .serif{font-family:'Fraunces',serif;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  ::selection{background:var(--brass);color:var(--ivory);}
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 5vw;
+    background:rgba(232,225,207,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line-dark);
+  }
+  .nav-brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:600;font-size:1.15rem;letter-spacing:0.01em;}
+  .nav-mark{width:26px;height:26px;border-radius:50%;border:2px solid var(--brass);position:relative;flex-shrink:0;}
+  .nav-mark::after{content:'';position:absolute;inset:5px;border-radius:50%;border:2px solid var(--sage);}
+  .nav-links{display:flex;gap:28px;align-items:center;font-size:0.88rem;}
+  .nav-links button{color:var(--ink);opacity:0.75;transition:opacity .2s;}
+  .nav-links button:hover{opacity:1;}
+  .nav-cta{
+    background:var(--ink);color:var(--ivory);padding:9px 18px;border-radius:2px;
+    font-size:0.85rem;font-weight:500;letter-spacing:0.02em;
+    transition:background .2s;
+  }
+  .nav-cta:hover{background:var(--sage);}
+
+  .app{max-width:1180px;margin:0 auto;padding:0 5vw;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:96px 5vw 80px;
+    display:grid;grid-template-columns:1.15fr 0.85fr;gap:60px;
+    max-width:1280px;margin:0 auto;
+    border-bottom:1px solid var(--line-dark);
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--sage);margin-bottom:22px;display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:'';width:26px;height:1px;background:var(--sage);}
+  .hero h1{
+    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2.4rem,4.6vw,3.6rem);
+    line-height:1.08;letter-spacing:-0.01em;margin-bottom:22px;
+  }
+  .hero h1 em{font-style:italic;color:var(--brass);font-weight:500;}
+  .hero p.lede{font-size:1.05rem;line-height:1.6;opacity:0.78;max-width:44ch;margin-bottom:32px;}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--ink);color:var(--ivory);padding:14px 26px;border-radius:2px;
+    font-size:0.92rem;font-weight:500;letter-spacing:0.01em;transition:transform .15s, background .2s;
+  }
+  .btn-primary:hover{background:var(--brass);transform:translateY(-1px);}
+  .btn-ghost{
+    padding:14px 22px;border:1px solid var(--line-dark);border-radius:2px;font-size:0.92rem;
+    transition:border-color .2s, background .2s;
+  }
+  .btn-ghost:hover{border-color:var(--ink);background:rgba(20,32,28,0.04);}
+
+  .ledger-card{
+    background:var(--ink);color:var(--ivory);border-radius:3px;padding:30px 28px;
+    align-self:start;position:relative;overflow:hidden;
+  }
+  .ledger-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--brass),var(--sage));
+  }
+  .ledger-title{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.55;margin-bottom:20px;}
+  .ledger-row{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line);}
+  .ledger-row:last-child{border-bottom:none;}
+  .ledger-label{font-size:0.85rem;opacity:0.72;}
+  .ledger-value{font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:500;}
+  .ledger-value.up{color:var(--brass-light);}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:76px 5vw;max-width:1280px;margin:0 auto;}
+  .section-head{margin-bottom:44px;max-width:60ch;}
+  .section-head .eyebrow{margin-bottom:14px;}
+  .section-head h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.7rem,2.8vw,2.3rem);line-height:1.15;}
+
+  /* Products */
+  .products{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .product-card{
+    background:var(--ivory);border:1px solid var(--line-dark);border-radius:3px;padding:30px 26px;
+    display:flex;flex-direction:column;gap:16px;position:relative;transition:transform .2s, box-shadow .2s;
+  }
+  .product-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,32,28,0.09);}
+  .product-tag{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--sage);}
+  .product-card h3{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;}
+  .product-card p{font-size:0.88rem;opacity:0.72;line-height:1.55;}
+  .product-price{font-family:'IBM Plex Mono',monospace;font-size:1.5rem;font-weight:600;margin-top:auto;}
+  .product-commission{
+    font-size:0.78rem;background:rgba(95,122,90,0.12);color:var(--sage);
+    padding:6px 10px;border-radius:2px;display:inline-block;width:fit-content;font-family:'IBM Plex Mono',monospace;
+  }
+
+  /* How it works */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  .step{border-top:2px solid var(--ink-dark, var(--ink));padding-top:18px;}
+  .step-num{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--brass);margin-bottom:10px;}
+  .step h4{font-family:'Fraunces',serif;font-size:1.08rem;font-weight:600;margin-bottom:8px;}
+  .step p{font-size:0.86rem;opacity:0.7;line-height:1.55;}
+
+  .guardrail{
+    margin-top:40px;background:rgba(166,72,46,0.07);border-left:3px solid var(--rust);
+    padding:20px 24px;border-radius:0 2px 2px 0;font-size:0.88rem;line-height:1.6;
+  }
+  .guardrail b{color:var(--rust);}
+
+  footer{
+    padding:40px 5vw;border-top:1px solid var(--line-dark);
+    display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;opacity:0.6;
+    max-width:1280px;margin:0 auto;flex-wrap:wrap;gap:12px;
+  }
+
+  /* ---------- AUTH / FORM VIEWS ---------- */
+  .center-view{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:60px 5vw;background:var(--ink);
+  }
+  .form-card{
+    background:var(--ivory);border-radius:4px;max-width:460px;width:100%;padding:44px 40px;position:relative;overflow:hidden;
+  }
+  .form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brass),var(--sage));}
+  .form-card .eyebrow{color:var(--sage);}
+  .form-card h2{font-family:'Fraunces',serif;font-size:1.7rem;font-weight:600;margin-bottom:8px;}
+  .form-card .sub{font-size:0.88rem;opacity:0.68;margin-bottom:28px;line-height:1.5;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:0.78rem;font-family:'IBM Plex Mono',monospace;letter-spacing:0.03em;margin-bottom:7px;opacity:0.75;}
+  .field input{
+    width:100%;padding:12px 14px;border:1px solid var(--line-dark);border-radius:2px;
+    font-family:'IBM Plex Sans',sans-serif;font-size:0.94rem;background:#fff;color:var(--ink);
+    transition:border-color .2s;
+  }
+  .field input:focus{outline:none;border-color:var(--brass);}
+  .field .hint{font-size:0.75rem;opacity:0.55;margin-top:5px;}
+  .form-error{background:rgba(166,72,46,0.1);color:var(--rust);padding:10px 14px;border-radius:2px;font-size:0.83rem;margin-bottom:16px;}
+  .form-switch{margin-top:20px;font-size:0.85rem;text-align:center;opacity:0.75;}
+  .form-switch button{color:var(--brass);font-weight:500;}
+  .back-link{position:absolute;top:24px;left:24px;color:var(--ivory);opacity:0.6;font-size:0.85rem;display:flex;align-items:center;gap:6px;z-index:5;}
+  .back-link:hover{opacity:1;}
+
+  /* Payment screen */
+  .pay-summary{background:var(--parchment-dim);border-radius:3px;padding:20px;margin-bottom:22px;}
+  .pay-row{display:flex;justify-content:space-between;font-size:0.9rem;padding:7px 0;}
+  .pay-row.total{border-top:1px solid var(--line-dark);margin-top:6px;padding-top:12px;font-weight:600;font-family:'IBM Plex Mono',monospace;}
+  .card-visual{
+    background:linear-gradient(135deg,var(--ink),var(--ink-soft));color:var(--ivory);border-radius:6px;
+    padding:22px;margin-bottom:22px;font-family:'IBM Plex Mono',monospace;position:relative;overflow:hidden;
+  }
+  .card-visual::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(168,124,43,0.35),transparent 70%);}
+  .card-chip{width:32px;height:24px;background:var(--brass-light);border-radius:4px;margin-bottom:22px;}
+  .processing{display:flex;align-items:center;gap:10px;justify-content:center;padding:14px;font-size:0.88rem;opacity:0.7;}
+  .spinner{width:14px;height:14px;border:2px solid var(--line-dark);border-top-color:var(--brass);border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- DASHBOARD ---------- */
+  .dash{min-height:100vh;background:var(--parchment);}
+  .dash-nav{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;
+    background:var(--ink);color:var(--ivory);
+  }
+  .dash-nav .nav-brand{color:var(--ivory);}
+  .dash-user{display:flex;align-items:center;gap:14px;font-size:0.85rem;}
+  .dash-avatar{
+    width:34px;height:34px;border-radius:50%;background:var(--brass);color:var(--ink);
+    display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:600;
+  }
+  .logout-btn{opacity:0.6;font-size:0.82rem;}
+  .logout-btn:hover{opacity:1;}
+
+  .dash-body{max-width:1180px;margin:0 auto;padding:44px 5vw 80px;}
+  .dash-head{margin-bottom:34px;}
+  .dash-head .eyebrow{color:var(--sage);}
+  .dash-head h1{font-family:'Fraunces',serif;font-weight:600;font-size:1.9rem;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px;}
+  .stat-card{background:var(--ivory);border:1px solid var(--line-dark);border-radius:3px;padding:22px 20px;}
+  .stat-label{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;}
+  .stat-value{font-family:'IBM Plex Mono',monospace;font-size:1.6rem;font-weight:600;}
+  .stat-value.brass{color:var(--brass);}
+  .stat-value.sage{color:var(--sage);}
+
+  .dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:start;}
+  .panel{background:var(--ivory);border:1px solid var(--line-dark);border-radius:3px;padding:28px;}
+  .panel h3{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:600;margin-bottom:6px;}
+  .panel .sub{font-size:0.82rem;opacity:0.6;margin-bottom:20px;}
+
+  /* growth rings */
+  .rings-wrap{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  .rings-legend{flex:1;min-width:180px;}
+  .legend-row{display:flex;align-items:center;gap:10px;font-size:0.85rem;padding:6px 0;}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+  .code-box{
+    display:flex;align-items:center;justify-content:space-between;background:var(--parchment-dim);
+    border-radius:2px;padding:12px 16px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.95rem;
+  }
+  .code-box button{color:var(--brass);font-size:0.78rem;font-weight:600;}
+
+  .list-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-dark);font-size:0.88rem;}
+  .list-row:last-child{border-bottom:none;}
+  .list-empty{font-size:0.85rem;opacity:0.55;padding:14px 0;line-height:1.6;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;padding:3px 8px;border-radius:2px;background:rgba(95,122,90,0.14);color:var(--sage);}
+
+  .withdraw-box{margin-top:18px;}
+  .withdraw-btn{
+    width:100%;background:var(--ink);color:var(--ivory);padding:13px;border-radius:2px;font-size:0.9rem;font-weight:500;
+    transition:background .2s;
+  }
+  .withdraw-btn:hover:not(:disabled){background:var(--sage);}
+  .withdraw-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .withdraw-note{font-size:0.78rem;opacity:0.6;margin-top:10px;line-height:1.5;}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--ivory);padding:13px 22px;border-radius:2px;font-size:0.87rem;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);z-index:100;display:flex;align-items:center;gap:10px;
+  }
+  .toast .dot{width:7px;height:7px;border-radius:50%;background:var(--brass-light);}
+
+  @media(max-width:860px){
+    .hero{grid-template-columns:1fr;padding-top:70px;}
+    .products{grid-template-columns:1fr;}
+    .steps{grid-template-columns:1fr 1fr;}
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .dash-grid{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/* ============================================================
+   CONFIG — fill these in once you've created your Supabase project.
+   Supabase Dashboard > Project Settings > API
+   ============================================================ */
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';       // e.g. https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';      // safe to expose in frontend — RLS protects data
+const FUNCTIONS_URL = SUPABASE_URL.replace('.supabase.co', '.functions.supabase.co');
+
+const sb = (SUPABASE_URL.startsWith('YOUR_'))
+  ? null
+  : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const CONFIG_MISSING = !sb;
+
+/* ============================================================
+   APP STATE
+   ============================================================ */
+let state = {
+  view: 'landing',
+  session: null,       // supabase auth session
+  profile: null,        // row from public.profiles
+  loading: false,
+  error: '',
+  pendingReferralCode: '',
+  toast: null
+};
+
+const PRODUCTS = [
+  { id:'trading', tag:'Core', name:'Trading Course', price:15000, commission:4000, desc:'Foundational SMC/ICT price-action course — key levels, liquidity, and structure across timeframes.' },
+  { id:'signals', tag:'Ongoing', name:'Signal Access', price:10000, commission:2500, desc:'Monthly trade signals with entries, invalidation, and risk framing for US30, XAUUSD and synthetics.' },
+  { id:'video', tag:'Flagship', name:'Video Mentorship', price:200000, commission:45000, desc:'The complete mentorship archive — full trading system, live sessions, and lifetime replays.' }
+];
+const REG_FEE = 8000;
+const WITHDRAW_MIN = 5000;
+
+function money(n){ return '₦' + Number(n).toLocaleString('en-NG'); }
+function render(){ App(document.getElementById('root')); }
+function setState(patch){ state = {...state, ...patch}; render(); }
+function showToast(msg){
+  state.toast = msg; render();
+  setTimeout(()=>{ if(state.toast===msg){ state.toast=null; render(); } }, 3200);
+}
+
+/* ============================================================
+   CONFIG-MISSING BANNER
+   Shown until real Supabase keys are added, so the frontend is
+   still viewable/demoable without a live backend connected yet.
+   ============================================================ */
+function ConfigBanner(){
+  if(!CONFIG_MISSING) return '';
+  return `<div style="background:#A6482E;color:#F2EFE6;padding:10px 20px;text-align:center;font-size:0.82rem;font-family:'IBM Plex Mono',monospace;">
+    ⚠ Backend not connected — add your Supabase URL and anon key at the top of the script to go live.
+  </div>`;
+}
+
+/* ============================================================
+   AUTH / DATA HELPERS
+   ============================================================ */
+async function refreshSession(){
+  if(!sb) return;
+  const { data } = await sb.auth.getSession();
+  state.session = data.session;
+  if(state.session){
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', state.session.user.id).maybeSingle();
+    state.profile = profile;
+  } else {
+    state.profile = null;
+  }
+}
+
+async function getDownlines(profileId){
+  if(!sb) return { direct: [] };
+  const { data } = await sb.from('downline_view').select('*').eq('referrer_id', profileId);
+  return { direct: data || [] };
+}
+
+async function getPurchaseHistory(profileId){
+  if(!sb) return [];
+  const { data } = await sb.from('purchases')
+    .select('*')
+    .eq('referrer_id', profileId)
+    .eq('status', 'success')
+    .order('created_at', { ascending:false });
+  return data || [];
+}
+
+async function callFunction(name, body){
+  const { data: sessionData } = await sb.auth.getSession();
+  const token = sessionData?.session?.access_token;
+  const res = await fetch(`${FUNCTIONS_URL}/${name}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ ...body, authorization: token ? `Bearer ${token}` : undefined })
+  });
+  return res.json();
+}
+
+/* ============================================================
+   VIEWS — visual layer is unchanged from the prototype; only the
+   data/auth plumbing underneath is new.
+   ============================================================ */
+function Nav(){
+  return `
+  <nav class="nav">
+    <div class="nav-brand"><span class="nav-mark"></span> The Ledger</div>
+    <div class="nav-links">
+      <button onclick="scrollToSection('products')">Programs</button>
+      <button onclick="scrollToSection('how')">How affiliates earn</button>
+      <button onclick="setState({view:'login'})">Log in</button>
+    </div>
+    <button class="nav-cta" onclick="setState({view:'register'})">Become an Affiliate</button>
+  </nav>`;
+}
+
+function LandingView(){
+  return `
+  <div>
+    ${Nav()}
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Trading Mentorship & Affiliate Program</div>
+        <h1>Learn the markets.<br>Teach what you've<br>learned. <em>Get paid for both.</em></h1>
+        <p class="lede">The Ledger trains traders in price action and market structure — and pays certified affiliates real commission every time someone they refer buys a course, signal plan, or mentorship seat.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="setState({view:'register'})">Become a Certified Affiliate — ${money(REG_FEE)}</button>
+          <button class="btn-ghost" onclick="scrollToSection('products')">See the programs</button>
+        </div>
+      </div>
+      <div class="ledger-card">
+        <div class="ledger-title">Sample Affiliate Ledger</div>
+        <div class="ledger-row"><span class="ledger-label">Trading Course referral</span><span class="ledger-value up">+ ${money(4000)}</span></div>
+        <div class="ledger-row"><span class="ledger-label">Signal Access referral</span><span class="ledger-value up">+ ${money(2500)}</span></div>
+        <div class="ledger-row"><span class="ledger-label">Video Mentorship referral</span><span class="ledger-value up">+ ${money(45000)}</span></div>
+        <div class="ledger-row"><span class="ledger-label">Monthly payout window</span><span class="ledger-value">Opens 1st</span></div>
+      </div>
+    </div>
+
+    <section id="products">
+      <div class="section-head">
+        <div class="eyebrow">What you're actually selling</div>
+        <h2>Three real programs. Every commission is tied to one of them.</h2>
+      </div>
+      <div class="products">
+        ${PRODUCTS.map(p=>`
+          <div class="product-card">
+            <span class="product-tag">${p.tag}</span>
+            <h3>${p.name}</h3>
+            <p>${p.desc}</p>
+            <div class="product-price">${money(p.price)}</div>
+            <span class="product-commission">Affiliate earns ${money(p.commission)} per sale</span>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="section-head">
+        <div class="eyebrow">How the affiliate program works</div>
+        <h2>Certification, a referral code, and commission on real sales.</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-num">01</div><h4>Certify</h4><p>Pay ${money(REG_FEE)} once for affiliate training, swipe files, and dashboard access.</p></div>
+        <div class="step"><div class="step-num">02</div><h4>Share your code</h4><p>Every affiliate gets a unique referral code to attach to any of the three programs.</p></div>
+        <div class="step"><div class="step-num">03</div><h4>They enroll</h4><p>Someone uses your code to buy a course, signal plan, or mentorship seat.</p></div>
+        <div class="step"><div class="step-num">04</div><h4>You get paid</h4><p>Commission lands in your dashboard balance. Withdraw once a month.</p></div>
+      </div>
+      <div class="guardrail">
+        <b>How this program is built:</b> commission is only ever paid when someone buys a real course, signal plan, or mentorship seat through your code, confirmed by a real payment webhook. There is no payout for simply recruiting another affiliate.
+      </div>
+    </section>
+
+    <footer>
+      <div>© 2026 The Ledger Trading Academy</div>
+      <div class="mono">${CONFIG_MISSING ? 'Backend not yet connected' : 'Live'}</div>
+    </footer>
+  </div>`;
+}
+
+function LoginView(){
+  return `
+  <div class="center-view">
+    <button class="back-link" onclick="setState({view:'landing',error:''})">← Back</button>
+    <div class="form-card">
+      <div class="eyebrow">Affiliate Access</div>
+      <h2>Welcome back</h2>
+      <div class="sub">Log in to your dashboard to check earnings and downlines.</div>
+      ${state.error ? `<div class="form-error">${state.error}</div>` : ''}
+      <form onsubmit="return handleLogin(event)">
+        <div class="field"><label>Email</label><input id="login-email" type="email" required autocomplete="email"></div>
+        <div class="field"><label>Password</label><input id="login-password" type="password" required autocomplete="current-password"></div>
+        <button class="btn-primary" style="width:100%;margin-top:6px;" type="submit">${state.loading ? 'Checking…' : 'Log In'}</button>
+      </form>
+      <div class="form-switch">New here? <button onclick="setState({view:'register',error:''})">Become an affiliate</button></div>
+    </div>
+  </div>`;
+}
+
+function RegisterView(){
+  return `
+  <div class="center-view">
+    <button class="back-link" onclick="setState({view:'landing',error:''})">← Back</button>
+    <div class="form-card">
+      <div class="eyebrow">Step 1 of 2</div>
+      <h2>Become a Certified Affiliate</h2>
+      <div class="sub">Create your account. You'll pay the ${money(REG_FEE)} certification fee on the next step via secure checkout.</div>
+      ${state.error ? `<div class="form-error">${state.error}</div>` : ''}
+      <form onsubmit="return handleRegisterSubmit(event)">
+        <div class="field"><label>Full name</label><input id="reg-name" required></div>
+        <div class="field"><label>Email</label><input id="reg-email" type="email" required></div>
+        <div class="field"><label>Phone</label><input id="reg-phone" required></div>
+        <div class="field"><label>Choose a password</label><input id="reg-password" type="password" required minlength="6"></div>
+        <div class="field"><label>Referral code (optional)</label><input id="reg-referral" placeholder="e.g. KAIZ4821"><div class="hint">If someone referred you, enter their code so they're credited.</div></div>
+        <button class="btn-primary" style="width:100%;margin-top:6px;" type="submit">${state.loading ? 'Please wait…' : 'Create Account & Continue'}</button>
+      </form>
+      <div class="form-switch">Already certified? <button onclick="setState({view:'login',error:''})">Log in</button></div>
+    </div>
+  </div>`;
+}
+
+function PaymentPendingView(){
+  return `
+  <div class="center-view">
+    <div class="form-card" style="text-align:center;">
+      <div class="eyebrow">Step 2 of 2</div>
+      <h2>Redirecting to secure checkout</h2>
+      <div class="sub">You'll be sent to Paystack to complete the ${money(REG_FEE)} certification payment. After payment, come back and log in — your account activates automatically once the payment is confirmed.</div>
+      <div class="processing"><span class="spinner"></span> ${state.loading ? 'Starting checkout…' : 'Ready'}</div>
+      ${state.error ? `<div class="form-error" style="margin-top:16px;">${state.error}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function ringSVG(directCount){
+  const size = 190, cx = size/2, cy = size/2;
+  const r2 = 58, r3 = 84;
+  const dot = (r, angle, color) => {
+    const a = angle * Math.PI/180;
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${color}"/>`;
+  };
+  let dots = '';
+  const dCount = Math.min(directCount, 12);
+  for(let i=0;i<dCount;i++){ dots += dot(r2, (360/Math.max(dCount,1))*i - 90, '#A87C2B'); }
+  return `
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r3}" fill="none" stroke="rgba(20,32,28,0.12)" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="${r2}" fill="none" stroke="rgba(20,32,28,0.16)" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="9" fill="#14201C"/>
+    ${dots}
+  </svg>`;
+}
+
+async function DashboardView(){
+  const m = state.profile;
+  if(!m){ return `<div class="dash"><div class="dash-body" style="padding-top:120px;text-align:center;">
+    <p style="margin-bottom:16px;">Your account isn't active yet — this usually means the certification payment hasn't been confirmed.</p>
+    <button class="btn-primary" onclick="setState({view:'landing'})">Back home</button>
+  </div></div>`; }
+
+  const { direct } = await getDownlines(m.id);
+  const history = await getPurchaseHistory(m.id);
+  const totalEarned = history.reduce((s,p)=>s+Number(p.commission),0);
+  const milestone = direct.length>=10?'Mentor Circle':direct.length>=5?'Rising Mentor':direct.length>=1?'Active Affiliate':'Certified';
+
+  return `
+  <div class="dash">
+    <div class="dash-nav">
+      <div class="nav-brand"><span class="nav-mark"></span> The Ledger</div>
+      <div class="dash-user">
+        <span class="badge">${milestone}</span>
+        <div class="dash-avatar">${(m.full_name||'?').charAt(0).toUpperCase()}</div>
+        <span>${m.full_name}</span>
+        <button class="logout-btn" onclick="handleLogout()">Log out</button>
+      </div>
+    </div>
+    <div class="dash-body">
+      <div class="dash-head">
+        <div class="eyebrow">Affiliate Dashboard</div>
+        <h1>Welcome back, ${m.full_name.split(' ')[0]}</h1>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Available Balance</div><div class="stat-value brass">${money(m.balance||0)}</div></div>
+        <div class="stat-card"><div class="stat-label">Total Earned</div><div class="stat-value">${money(totalEarned)}</div></div>
+        <div class="stat-card"><div class="stat-label">Direct Referrals</div><div class="stat-value sage">${direct.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Confirmed Sales</div><div class="stat-value">${history.length}</div></div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <h3>Growth Rings</h3>
+          <div class="sub">You at center · ring is who you brought in — only real, paid enrollments appear here</div>
+          <div class="rings-wrap">
+            ${ringSVG(direct.length)}
+            <div class="rings-legend">
+              <div class="legend-row"><span class="legend-dot" style="background:#14201C"></span> You</div>
+              <div class="legend-row"><span class="legend-dot" style="background:#A87C2B"></span> ${direct.length} direct referral${direct.length===1?'':'s'}</div>
+            </div>
+          </div>
+
+          <h3 style="margin-top:30px;">Your Referral Code</h3>
+          <div class="code-box">
+            <span>${m.referral_code}</span>
+            <button onclick="copyCode('${m.referral_code}')">Copy</button>
+          </div>
+
+          <h3 style="margin-top:30px;">Direct Downlines</h3>
+          ${direct.length ? direct.map(d=>`
+            <div class="list-row"><span>${d.full_name}</span><span class="mono" style="opacity:0.6;">joined ${new Date(d.joined_at).toLocaleDateString()}</span></div>
+          `).join('') : `<div class="list-empty">No referrals yet — share your code above. Every confirmed enrollment made with it appears here.</div>`}
+        </div>
+
+        <div>
+          <div class="panel">
+            <h3>Share Your Programs</h3>
+            <div class="sub">Send buyers to checkout with your code attached</div>
+            ${PRODUCTS.map(p=>`
+              <div class="list-row">
+                <span>${p.name}<br><span class="mono" style="font-size:0.75rem;opacity:0.55;">+${money(p.commission)} commission</span></span>
+                <button class="btn-ghost" style="padding:8px 14px;font-size:0.8rem;" onclick="copyCheckoutLink('${p.id}','${m.referral_code}')">Copy Link</button>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="panel" style="margin-top:20px;">
+            <h3>Withdraw</h3>
+            <div class="sub">Once per calendar month, minimum ${money(WITHDRAW_MIN)}. Payout processed manually to your bank details on file.</div>
+            <div class="withdraw-box">
+              <button class="withdraw-btn" ${m.balance >= WITHDRAW_MIN ? '' : 'disabled'} onclick="handleWithdraw()">
+                ${m.balance >= WITHDRAW_MIN ? `Request Withdrawal of ${money(m.balance)}` : `Below ${money(WITHDRAW_MIN)} minimum`}
+              </button>
+              <div class="withdraw-note">Withdrawal requests are recorded as pending — funds are sent manually and marked paid once transferred.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   HANDLERS
+   ============================================================ */
+function scrollToSection(id){ document.getElementById(id)?.scrollIntoView({behavior:'smooth'}); }
+
+function copyCode(code){ navigator.clipboard?.writeText(code).catch(()=>{}); showToast('Referral code copied'); }
+
+function copyCheckoutLink(productId, code){
+  const url = `${location.origin}${location.pathname}?buy=${productId}&ref=${code}`;
+  navigator.clipboard?.writeText(url).catch(()=>{});
+  showToast('Checkout link copied');
+}
+
+async function handleLogin(e){
+  e.preventDefault();
+  if(CONFIG_MISSING){ setState({error:'Backend not connected yet — add Supabase keys first.'}); return false; }
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  setState({loading:true, error:''});
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){ setState({loading:false, error: error.message}); return false; }
+  await refreshSession();
+  setState({loading:false, view:'dashboard'});
+  return false;
+}
+
+async function handleLogout(){
+  await sb.auth.signOut();
+  setState({view:'landing', session:null, profile:null});
+}
+
+async function handleRegisterSubmit(e){
+  e.preventDefault();
+  if(CONFIG_MISSING){ setState({error:'Backend not connected yet — add Supabase keys first.'}); return false; }
+
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const refCode = document.getElementById('reg-referral').value.trim().toUpperCase();
+
+  setState({loading:true, error:''});
+
+  // 1. Create the auth user (Supabase hashes and stores the password securely).
+  const { data: signUpData, error: signUpErr } = await sb.auth.signUp({ email, password });
+  if(signUpErr){ setState({loading:false, error: signUpErr.message}); return false; }
+
+  const userId = signUpData.user?.id;
+  if(!userId){
+    setState({loading:false, error:'Check your inbox to confirm your email, then log in.'});
+    return false;
+  }
+
+  // 2. Resolve referral code to a referrer id (informational only — the
+  //    edge function re-resolves this too, since it's the source of truth).
+  let referredBy = null;
+  if(refCode){
+    const { data: referrer } = await sb.from('profiles').select('id').eq('referral_code', refCode).maybeSingle();
+    referredBy = referrer?.id ?? null;
+  }
+
+  // 3. Create the profile row (not yet certified — that flips true once payment confirms).
+  const { data: codeData } = await sb.rpc('generate_referral_code', { name });
+  await sb.from('profiles').insert({
+    id: userId, full_name: name, phone,
+    referral_code: codeData, referred_by: referredBy, is_certified: false, balance: 0
+  });
+
+  // 4. Kick off the real payment.
+  setState({loading:true, view:'payment', error:''});
+  const result = await callFunction('initiate-payment', { product_id:'certification', referral_code: refCode || undefined, buyer_email: email });
+  if(result.error){ setState({loading:false, error: result.error}); return false; }
+  window.location.href = result.authorization_url;
+  return false;
+}
+
+async function handleWithdraw(){
+  const result = await callFunction('request-withdrawal', {});
+  if(result.error){ showToast(result.error); return; }
+  await refreshSession();
+  render();
+  showToast(`Withdrawal of ${money(result.amount)} requested`);
+}
+
+/* ============================================================
+   ROOT RENDER
+   ============================================================ */
+async function App(root){
+  let html = ConfigBanner();
+  if(state.view==='landing') html += LandingView();
+  else if(state.view==='login') html += LoginView();
+  else if(state.view==='register') html += RegisterView();
+  else if(state.view==='payment') html += PaymentPendingView();
+  else if(state.view==='dashboard') html += `<div class="dash"><div class="dash-body" style="padding-top:120px;text-align:center;opacity:0.6;">Loading dashboard…</div></div>`;
+
+  root.innerHTML = html + (state.toast ? `<div class="toast"><span class="dot"></span>${state.toast}</div>` : '');
+
+  if(state.view==='dashboard'){
+    const dashHtml = await DashboardView();
+    root.innerHTML = ConfigBanner() + dashHtml + (state.toast ? `<div class="toast"><span class="dot"></span>${state.toast}</div>` : '');
+  }
+}
+
+(async function init(){
+  await refreshSession();
+  if(state.session && state.profile?.is_certified) state.view = 'dashboard';
+  render();
+})();
+</script>
+</body>
+</html>
